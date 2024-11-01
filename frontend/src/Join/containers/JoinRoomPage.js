@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import AvailableRooms from "../components/AvailableRooms";
 
 const JoinRoom = () => {
   return (
-    <div>Join Room</div>
-  )
-}
+    <div className="w-[60vw]">
+      <AvailableRooms />
+    </div>
+  );
+};
 
-export default JoinRoom
+export default JoinRoom;
