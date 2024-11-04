@@ -1,4 +1,4 @@
-import { getDatabase } from '../database.js';
+import { getDatabase } from './database.js';
 
 // Create a new room
 export const createRoom = async (req, res) => {
@@ -71,7 +71,7 @@ export const getUsersInRoom = async (req, res) => {
 
     try {
         const users = await db.all(sql, [roomId]);
-        res.status(200).json(users.map(user => user.user_id)); // Return just the user IDs
+        res.status(200).json(users.map(user => user.user_id)); 
     } catch (err) {
         console.error('Error fetching users in room:', err.message);
         res.status(500).json({ error: 'Failed to fetch users in room' });

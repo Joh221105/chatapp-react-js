@@ -5,7 +5,7 @@ import {
     getRooms,
     addUserToRoom,
     getUsersInRoom
-} from '../controllers/roomsController.js';
+} from './roomController.js';
 
 const router = express.Router();
 
