@@ -7,6 +7,7 @@ import JoinForm from './JoinForm';
 const AvailableRooms = () => {
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [showJoinForm, setShowJoinForm] = useState(false);
+    const [username, setUsername] = useState(""); 
     const navigate = useNavigate();
 
     const handleJoinRoom = (room) => {
@@ -17,15 +18,16 @@ const AvailableRooms = () => {
     const handleSubmit = (username) => {
         console.log(`${username} joined room: ${selectedRoom.name}`);
         setShowJoinForm(false); // Hide the join form
-        navigate(`/room/${selectedRoom.id}`);
+        navigate(`/room/${selectedRoom.id}`)
     };
 
     const handleCancel = () => {
-        setShowJoinForm(false); // Hide the join form when canceling
+        setShowJoinForm(false); // Hide the join form
+        setUsername(""); // Reset username when the form is canceled
     };
 
     return (
-        <div className="p-5 bg-red-200 rounded-lg">
+        <div className="p-5">
             <h2 className="text-2xl font-bold mb-4">Available Rooms</h2>
             <div className="space-y-4">
                 {rooms.map((room) => (
@@ -36,12 +38,16 @@ const AvailableRooms = () => {
                     />
                 ))}
             </div>
-            <JoinForm 
-                room={selectedRoom} 
-                onSubmit={handleSubmit} 
-                onCancel={handleCancel} 
-                show={showJoinForm} 
-            />
+            {showJoinForm && (
+                <JoinForm 
+                    room={selectedRoom} 
+                    onSubmit={handleSubmit} // Pass the submit handler to JoinForm
+                    onCancel={handleCancel} // Pass cancel handler to JoinForm
+                    username={username} // Pass username to JoinForm
+                    setUsername={setUsername} // Pass setUsername function to JoinForm
+                    show={showJoinForm} 
+                />
+            )}
         </div>
     );
 };

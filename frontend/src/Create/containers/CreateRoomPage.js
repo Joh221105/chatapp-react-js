@@ -7,8 +7,6 @@ const CreateRoomPage = () => {
   const navigate = useNavigate();
 
   const handleCreateRoom = () => {
-    // Here, you can add logic to create a room
-    // For now, we just navigate to the chat room page
     navigate(`/room/${roomName}`, { state: { username } });
   };
 
