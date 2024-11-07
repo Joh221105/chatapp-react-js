@@ -65,15 +65,30 @@ export const addUserToRoom = async (req, res) => {
 
 // Get users in a room
 export const getUsersInRoom = async (req, res) => {
-    const { roomId } = req.params;
+    const { roomId } = req.params; // Extract roomId
     const db = await getDatabase();
     const sql = 'SELECT user_id FROM room_users WHERE room_id = ?';
-
     try {
         const users = await db.all(sql, [roomId]);
-        res.status(200).json(users.map(user => user.user_id)); 
+        if (!users.length) {
+            return res.status(404).json({ error: 'Room not found' });
+        }
+        res.status(200).json(users);
     } catch (err) {
-        console.error('Error fetching users in room:', err.message);
-        res.status(500).json({ error: 'Failed to fetch users in room' });
+        console.error('Error fetching users:', err.message);
+        res.status(500).json({ error: 'Failed to fetch users' });
     }
 };
+
+// Removes user from user list
+export const removeUserFromRoom = async (roomId, userId) => {
+    const db = await getDatabase();
+    const sql = 'DELETE FROM room_users WHERE room_id = ? AND user_id = ?';
+  
+    try {
+      await db.run(sql, [roomId, userId]);
+      console.log(`User ${userId} removed from room ${roomId}`);
+    } catch (err) {
+      console.error('Error removing user from room:', err.message);
+    }
+  };

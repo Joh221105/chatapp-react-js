@@ -4,24 +4,28 @@ import {
     getRoom,
     getRooms,
     addUserToRoom,
-    getUsersInRoom
+    getUsersInRoom,
+    removeUserFromRoom
 } from './roomController.js';
 
-const router = express.Router();
+const app = express.Router();
 
 // Create a new room
-router.post('/create', createRoom);
+app.post('/create', createRoom);
 
 // Get a specific room by ID
-router.get('/:roomId', getRoom);
+app.get('/:roomId', getRoom);
 
 // Get all rooms
-router.get('/', getRooms);
+app.get('/', getRooms);
 
 // Add a user to a room
-router.post('/addUser', addUserToRoom);
+app.post('/addUser', addUserToRoom);
 
 // Get all users in a specific room
-router.get('/:roomId/users', getUsersInRoom);
+app.get('/:roomId/users', getUsersInRoom);
 
-export default router;
+// Remove user from room user list when leaving room
+app.post('/leave', removeUserFromRoom);
+
+export default app;
