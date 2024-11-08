@@ -4,11 +4,30 @@ import RoomHeader from '../components/RoomHeader';
 import UserList from '../components/UserList';
 
 const ChatRoomPage = () => {
-  const { roomId } = useParams(); // Room Id from the URL
+  const { roomId } = useParams();
+  const [roomName, setRoomName] = useState('');
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
+
+    // Fetch room name
+    const fetchRoomDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/rooms/${roomId}`);
+        if (!response.ok) {
+          console.error('Room not found:', response.status);
+          return;
+        }
+
+        const roomData = await response.json();
+        setRoomName(roomData.name);
+      } catch (err) {
+        console.error('Error fetching room details:', err.message);
+      }
+    };
+
+    // Fetch users in the room
     const fetchUsers = async () => {
       try {
         const response = await fetch(`http://localhost:5000/rooms/${roomId}/users`);
@@ -24,15 +43,13 @@ const ChatRoomPage = () => {
       }
     };
 
+    fetchRoomDetails();
     fetchUsers();
-  }, [roomId]); 
+  }, [roomId]);
 
   const handleLeaveRoom = async () => {
     const userId = localStorage.getItem('userId');
     
-    console.log("Leaving room with Room ID:", roomId);
-    console.log("User ID:", userId);
-
     if (!userId) {
       console.error('User ID is not available in localStorage');
       return;
@@ -56,14 +73,11 @@ const ChatRoomPage = () => {
     } catch (err) {
       console.error('Error leaving room:', err.message);
     }
-};
+  };
 
-  
-  
-  
   return (
     <div className="chat-room-page min-h-screen bg-gray-100 flex flex-col">
-      <RoomHeader roomId={roomId} onLeaveRoom={handleLeaveRoom} />
+      <RoomHeader roomName={roomName} onLeaveRoom={handleLeaveRoom} />
       <UserList users={users} />
     </div>
   );

@@ -101,25 +101,30 @@ export const removeUserFromRoom = async (req, res) => {
   }
 };
 
-// export const deleteAllRoomsAndUsers = async (req, res) => {
-//   const db = await getDatabase();
+export const deleteAllRoomsAndUsers = async (req, res) => {
+  const db = await getDatabase();
 
-//   try {
+  try {
+    // Start a transaction to ensure both deletes happen together
+    await db.exec("BEGIN TRANSACTION");
 
-//     // Delete all users from room_users table
-//     await db.run("DELETE FROM room_users");
+    // Delete all users from room_users table
+    await db.run("DELETE FROM room_users");
 
-//     // Delete all rooms from rooms table
-//     await db.run("DELETE FROM rooms");
+    // Delete all rooms from rooms table
+    await db.run("DELETE FROM rooms");
 
-//     // Commit the transaction
-//     await db.exec("COMMIT");
-//     res
-//       .status(200)
-//       .json({ message: "All rooms and users deleted successfully" });
-//   } catch (err) {
-//     // Rollback transaction in case of error
-//     await db.exec("ROLLBACK");
-//     res.status(500).json({ error: "Error deleting all rooms and users" });
-//   }
-// };
+    // Reset room_id count back to 1
+    await db.run('DELETE FROM sqlite_sequence WHERE name = "rooms"');
+
+    // Commit the transaction
+    await db.exec("COMMIT");
+    res
+      .status(200)
+      .json({ message: "All rooms and users deleted successfully" });
+  } catch (err) {
+    // Rollback transaction in case of error
+    await db.exec("ROLLBACK");
+    res.status(500).json({ error: "Error deleting all rooms and users" });
+  }
+};
