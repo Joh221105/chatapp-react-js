@@ -6,7 +6,8 @@ import {
     addUserToRoom,
     getUsersInRoom,
     removeUserFromRoom,
-    deleteAllRoomsAndUsers
+    deleteAllRoomsAndUsers,
+    deleteRoomById
 } from './roomController.js';
 
 const app = express.Router();
@@ -28,6 +29,10 @@ app.get('/:roomId/users', getUsersInRoom);
 
 // Remove user from room user list when leaving room
 app.delete('/leave', removeUserFromRoom);
+
+// Delete room by id
+app.delete('/:roomId', deleteRoomById);
+
 
 // Delete all users and rooms
 app.delete('/', deleteAllRoomsAndUsers);
