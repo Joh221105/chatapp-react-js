@@ -21,7 +21,10 @@ const CreateRoomPage = () => {
             const { roomId } = await createRoomResponse.json();
             console.log("Room created with ID:", roomId);
 
-            // Add the creator to room's user list
+            // Store the userId (username) in localStorage
+            localStorage.setItem('userId', username);
+
+            // Add the creator to the room's user list
             const addUserResponse = await fetch('http://localhost:5000/rooms/addUser', {
                 method: 'POST',
                 headers: {
@@ -42,8 +45,7 @@ const CreateRoomPage = () => {
     } catch (err) {
         console.error('Error creating room or adding user:', err.message);
     }
-};
-
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">

@@ -11,7 +11,6 @@ const ChatRoomPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        console.log("Fetching users for room ID:", roomId);
         const response = await fetch(`http://localhost:5000/rooms/${roomId}/users`);
         if (!response.ok) {
           console.error('Room not found:', response.status);
@@ -19,7 +18,6 @@ const ChatRoomPage = () => {
         }
 
         const userList = await response.json();
-        console.log("Fetched users:", Object.values(userList));
         setUsers(Object.values(userList));
       } catch (err) {
         console.error('Error fetching users:', err.message);
@@ -30,22 +28,38 @@ const ChatRoomPage = () => {
   }, [roomId]); 
 
   const handleLeaveRoom = async () => {
+    const userId = localStorage.getItem('userId');
+    
+    console.log("Leaving room with Room ID:", roomId);
+    console.log("User ID:", userId);
+
+    if (!userId) {
+      console.error('User ID is not available in localStorage');
+      return;
+    }
+
     try {
-      // Update to use roomId instead of roomName
-      await fetch('/leave', {
-        method: 'POST',
+      const response = await fetch('http://localhost:5000/rooms/leave', {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ roomId}),
+        body: JSON.stringify({ roomId, userId }), 
       });
   
-      // Redirect user after leaving the room
-      navigate('/'); // Navigate back to the home page or other desired location
+      if (response.ok) {
+        console.log('User successfully left the room');
+        navigate('/');
+      } else {
+        console.error('Failed to leave room, status code:', response.status);
+      }
     } catch (err) {
       console.error('Error leaving room:', err.message);
     }
-  };
+};
+
+  
+  
   
   return (
     <div className="chat-room-page min-h-screen bg-gray-100 flex flex-col">

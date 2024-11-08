@@ -5,7 +5,8 @@ import {
     getRooms,
     addUserToRoom,
     getUsersInRoom,
-    removeUserFromRoom
+    removeUserFromRoom,
+    // deleteAllRoomsAndUsers
 } from './roomController.js';
 
 const app = express.Router();
@@ -26,6 +27,8 @@ app.post('/addUser', addUserToRoom);
 app.get('/:roomId/users', getUsersInRoom);
 
 // Remove user from room user list when leaving room
-app.post('/leave', removeUserFromRoom);
+app.delete('/leave', removeUserFromRoom);
+
+// app.delete('/', deleteAllRoomsAndUsers);
 
 export default app;
