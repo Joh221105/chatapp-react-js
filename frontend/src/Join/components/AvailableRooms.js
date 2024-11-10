@@ -16,7 +16,6 @@ const AvailableRooms = () => {
     };
 
     const handleSubmit = (username) => {
-        console.log(`${username} joined room: ${selectedRoom.name}`);
         setShowJoinForm(false); // Hide the join form
         navigate(`/room/${selectedRoom.id}`)
     };

@@ -106,6 +106,7 @@ export const removeUserFromRoom = async (req, res) => {
   }
 };
 
+// deletes all rooms and users
 export const deleteAllRoomsAndUsers = async (req, res) => {
   const db = await getDatabase();
 

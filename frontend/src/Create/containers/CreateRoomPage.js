@@ -9,7 +9,7 @@ const CreateRoomPage = () => {
   const handleCreateRoom = async () => {
     try {
         // Create the room
-        const createRoomResponse = await fetch('http://localhost:5000/rooms/create', {
+        const createRoomResponse = await fetch('http://localhost:5001/rooms/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ const CreateRoomPage = () => {
             localStorage.setItem('userId', username);
 
             // Add the creator to the room's user list
-            const addUserResponse = await fetch('http://localhost:5000/rooms/addUser', {
+            const addUserResponse = await fetch('http://localhost:5001/rooms/addUser', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

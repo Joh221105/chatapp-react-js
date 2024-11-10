@@ -14,7 +14,7 @@ const ChatRoomPage = () => {
     // Fetch room name
     const fetchRoomDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/rooms/${roomId}`);
+        const response = await fetch(`http://localhost:5001/rooms/${roomId}`);
         if (!response.ok) {
           console.error('Room not found:', response.status);
           return;
@@ -30,7 +30,7 @@ const ChatRoomPage = () => {
     // Fetch users in the room
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/rooms/${roomId}/users`);
+        const response = await fetch(`http://localhost:5001/rooms/${roomId}/users`);
         if (!response.ok) {
           console.error('Room not found:', response.status);
           return;
@@ -57,7 +57,7 @@ const ChatRoomPage = () => {
   
     try {
       // Remove user from the room
-      const response = await fetch('http://localhost:5000/rooms/leave', {
+      const response = await fetch('http://localhost:5001/rooms/leave', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -73,14 +73,14 @@ const ChatRoomPage = () => {
       console.log('User successfully left the room');
   
       // Call the backend to check if room is empty and delete it if necessary
-      const checkRoomResponse = await fetch(`http://localhost:5000/rooms/${roomId}/users`);
+      const checkRoomResponse = await fetch(`http://localhost:5001/rooms/${roomId}/users`);
       
       if (checkRoomResponse.ok) {
         const usersInRoom = await checkRoomResponse.json();
   
         // If no users are left in the room, delete the room
         if (usersInRoom.length === 0) {
-          const deleteRoomResponse = await fetch(`http://localhost:5000/rooms/${roomId}`, {
+          const deleteRoomResponse = await fetch(`http://localhost:5001/rooms/${roomId}`, {
             method: 'DELETE',
           });
   
@@ -100,10 +100,6 @@ const ChatRoomPage = () => {
       console.error('Error leaving room:', err.message);
     }
   };
-  
-  
-  
-  
   
 
   return (
