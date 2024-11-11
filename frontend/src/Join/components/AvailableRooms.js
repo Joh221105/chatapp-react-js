@@ -1,28 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import rooms from '../../data'; 
-import RoomCard from './RoomCard'; 
-import JoinForm from './JoinForm'; 
+import RoomCard from './RoomCard';
+import JoinForm from './JoinForm';
 
 const AvailableRooms = () => {
+    const [rooms, setRooms] = useState([]); // State for rooms from database
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [showJoinForm, setShowJoinForm] = useState(false);
-    const [username, setUsername] = useState(""); 
+    const [username, setUsername] = useState("");
     const navigate = useNavigate();
 
+    // Fetch rooms from database 
+    useEffect(() => {
+        const fetchRooms = async () => {
+            try {
+                const response = await fetch('http://localhost:5001/rooms'); 
+                if (!response.ok) {
+                    throw new Error('Failed to fetch rooms');
+                }
+                const data = await response.json();
+                setRooms(data); // Set the rooms state with fetched data
+            } catch (error) {
+                console.error('Error fetching rooms:', error);
+            }
+        };
+        fetchRooms();
+    }, []);
+
     const handleJoinRoom = (room) => {
-        setSelectedRoom(room); // Store the selected room
-        setShowJoinForm(true); // Show the join form
+        setSelectedRoom(room);
+        setShowJoinForm(true);
     };
 
     const handleSubmit = (username) => {
-        setShowJoinForm(false); // Hide the join form
-        navigate(`/room/${selectedRoom.id}`)
+        setShowJoinForm(false);
+        navigate(`/room/${selectedRoom.id}`);
     };
 
     const handleCancel = () => {
-        setShowJoinForm(false); // Hide the join form
-        setUsername(""); // Reset username when the form is canceled
+        setShowJoinForm(false);
+        setUsername("");
     };
 
     return (
@@ -40,10 +57,10 @@ const AvailableRooms = () => {
             {showJoinForm && (
                 <JoinForm 
                     room={selectedRoom} 
-                    onSubmit={handleSubmit} // Pass the submit handler to JoinForm
-                    onCancel={handleCancel} // Pass cancel handler to JoinForm
-                    username={username} // Pass username to JoinForm
-                    setUsername={setUsername} // Pass setUsername function to JoinForm
+                    onSubmit={handleSubmit}
+                    onCancel={handleCancel}
+                    username={username}
+                    setUsername={setUsername}
                     show={showJoinForm} 
                 />
             )}

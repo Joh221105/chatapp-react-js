@@ -1,13 +1,14 @@
 import React from "react";
 
 const RoomCard = ({ room, onJoin }) => {
+  const userCount = room.currentUsers ? room.currentUsers.length : 0; // Check if currentUsers exists
+
   return (
     <div className="flex align-center justify-between p-6 border border-gray-300 bg-slate-100 rounded-lg shadow-md mb-4">
       <div>
         <h3 className="text-lg font-semibold">{room.name}</h3>
         <p className="text-gray-600">
-          {room.currentUsers.length}{" "}
-          {room.currentUsers.length === 1 ? "user" : "users"} currently in room
+          {userCount} {userCount === 1 ? "user" : "users"} currently in room
         </p>
       </div>
       <button
