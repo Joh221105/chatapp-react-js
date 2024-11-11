@@ -117,11 +117,20 @@ const ChatRoomPage = () => {
   };
 
   return (
-    <div className="chat-room-page min-h-screen bg-gray-100 flex flex-col">
+    <div className="chat-room-page h-screen w-screen flex flex-col bg-gray-100">
       <RoomHeader roomName={roomName} onLeaveRoom={handleLeaveRoom} />
-      <UserList users={users} />
-      <MessageBox roomId={roomId}/>
-      <MessageInput roomId = {roomId}/>
+
+      <div className="flex-grow flex flex-row">
+        <div className="w-1/4 bg-white border-r border-gray-200 p-4">
+          <UserList users={users} />
+        </div>
+        <div className="w-3/4 flex flex-col justify-between">
+          <MessageBox roomId={roomId} />
+          <div className=" mb-10 p-10">
+            <MessageInput roomId={roomId} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

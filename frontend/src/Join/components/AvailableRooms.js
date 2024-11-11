@@ -67,8 +67,8 @@ const AvailableRooms = () => {
 
   return (
     <div className="p-5">
-      <h2 className="text-2xl font-bold mb-4">Available Rooms</h2>
-      <div className="space-y-4">
+      <h2 className="text-2xl font-bold mb-10 uppercase">Available Rooms</h2>
+      <div className="space-y-4 overflow-y-auto max-h-[60vh]">
         {rooms.map((room) => (
           <RoomCard key={room.id} room={room} onJoin={handleJoinRoom} />
         ))}

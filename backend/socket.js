@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 export const setupSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000", // Replace with your frontend URL
+      origin: "http://localhost:3000", 
       methods: ["GET", "POST"],
     },
   });
@@ -23,14 +23,14 @@ export const setupSocket = (server) => {
       }
     });
 
-    // // Handle user joining a room
-    // socket.on("join_room", (roomId) => {
-    //   socket.join(roomId); // Join the room
-    // });
+    // Handle user joining a room
+    socket.on("join_room", (roomId) => {
+      socket.join(roomId); // Join the room
+    });
 
-    // // Handle user disconnecting
-    // socket.on("disconnect", () => {
-    //   console.log(`User disconnected: ${socket.id}`);
-    // });
+    // Handle user disconnecting
+    socket.on("disconnect", () => {
+      console.log(`User disconnected: ${socket.id}`);
+    });
   });
 };

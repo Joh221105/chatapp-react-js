@@ -10,7 +10,7 @@ const RoomHeader = ({ roomName, onLeaveRoom }) => {
   };
 
   return (
-    <div className="room-header bg-blue-500 text-white p-4 flex flex-col justify-between items-center rounded-t">
+    <div className="room-header bg-blue-500 text-white p-8 flex justify-between items-center rounded-t">
       <h1 className=" my-5 text-2xl">Room: {roomName}</h1>
       <button
         onClick={handleLeave}
