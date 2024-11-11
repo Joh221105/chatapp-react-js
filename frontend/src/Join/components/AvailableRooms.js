@@ -64,11 +64,23 @@ const AvailableRooms = () => {
     setShowJoinForm(false);
     setUsername("");
   };
+  const handleHomeClick = () => {
+    navigate("/");
+  };
 
   return (
     <div className="p-5">
-      <h2 className="text-2xl font-bold mb-4">Available Rooms</h2>
-      <div className="space-y-4">
+      <div className="flex justify-between items-center h-full mb-10">
+        <h2 className="text-2xl font-bold uppercase">{"Available Rooms"}</h2>
+        <button
+          className="bg-red-300 rounded-lg py-2 px-6 text-slate-700 text-2xl font-bold"
+          onClick={handleHomeClick}
+        >
+          Back
+        </button>
+      </div>
+
+      <div className="space-y-4 overflow-y-auto max-h-[60vh]">
         {rooms.map((room) => (
           <RoomCard key={room.id} room={room} onJoin={handleJoinRoom} />
         ))}

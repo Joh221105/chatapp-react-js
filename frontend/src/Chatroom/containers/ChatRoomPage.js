@@ -76,38 +76,38 @@ const ChatRoomPage = () => {
       // Remove username from localStorage
       localStorage.removeItem("username");
 
-      // Call the backend to check if the room is empty 
-      // const checkRoomResponse = await fetch(
-      //   `http://localhost:5001/rooms/${roomId}/users`
-      // );
+      // Call the backend to check if the room is empty
+      const checkRoomResponse = await fetch(
+        `http://localhost:5001/rooms/${roomId}/users`
+      );
 
-      // if (checkRoomResponse.ok) {
-      //   const usersInRoom = await checkRoomResponse.json();
+      if (checkRoomResponse.ok) {
+        const usersInRoom = await checkRoomResponse.json();
 
-      //   // If no users are left in the room, delete the room
-      //   if (usersInRoom.length === 0) {
-      //     const deleteRoomResponse = await fetch(
-      //       `http://localhost:5001/rooms/${roomId}`,
-      //       {
-      //         method: "DELETE",
-      //       }
-      //     );
+        // If no users are left in the room, delete the room
+        if (usersInRoom.length === 0) {
+          const deleteRoomResponse = await fetch(
+            `http://localhost:5001/rooms/${roomId}`,
+            {
+              method: "DELETE",
+            }
+          );
 
-      //     if (deleteRoomResponse.ok) {
-      //       console.log("Room has been deleted");
-      //     } else {
-      //       console.error(
-      //         "Failed to delete room, status code:",
-      //         deleteRoomResponse.status
-      //       );
-      //     }
-      //   }
-      // } else {
-      //   console.error(
-      //     "Failed to fetch users in room, status code:",
-      //     checkRoomResponse.status
-      //   );
-      // }
+          if (deleteRoomResponse.ok) {
+            console.log("Room has been deleted");
+          } else {
+            console.error(
+              "Failed to delete room, status code:",
+              deleteRoomResponse.status
+            );
+          }
+        }
+      } else {
+        console.error(
+          "Failed to fetch users in room, status code:",
+          checkRoomResponse.status
+        );
+      }
 
       // Navigate to home
       navigate("/");
@@ -117,11 +117,20 @@ const ChatRoomPage = () => {
   };
 
   return (
-    <div className="chat-room-page min-h-screen bg-gray-100 flex flex-col">
+    <div className="chat-room-page h-screen w-screen flex flex-col bg-gray-100">
       <RoomHeader roomName={roomName} onLeaveRoom={handleLeaveRoom} />
-      <UserList users={users} />
-      <MessageBox roomId={roomId}/>
-      <MessageInput roomId = {roomId}/>
+
+      <div className="flex-grow flex flex-row">
+        <div className="w-1/4 bg-white border-r border-gray-200 p-4">
+          <UserList users={users} />
+        </div>
+        <div className="w-3/4 flex flex-col justify-between">
+          <MessageBox roomId={roomId} />
+          <div className=" mb-10 p-10">
+            <MessageInput roomId={roomId} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
