@@ -1,7 +1,13 @@
 import React from "react";
 
-const JoinForm = ({ room, onSubmit, onCancel, username, setUsername, show }) => {
-  
+const JoinForm = ({
+  room,
+  onSubmit,
+  onCancel,
+  username,
+  setUsername,
+  show,
+}) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (username.trim()) {
@@ -14,7 +20,9 @@ const JoinForm = ({ room, onSubmit, onCancel, username, setUsername, show }) => 
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${show ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${
+        show ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
       onClick={onCancel} // Close form when clicking outside
     >
       <div
