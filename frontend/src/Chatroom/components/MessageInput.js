@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { io } from "socket.io-client";
 
-const MessageInput = () => {
-  const [message, setMessage] = useState('');
+const socket = io("http://localhost:5001");
+
+const MessageInput = ({ roomId }) => {
+  const [message, setMessage] = useState("");
+  const username = localStorage.getItem("userId"); // Get username from localStorage
 
   const handleSend = () => {
-    // placeholder
+    if (message.trim() !== "") {
+      // Emit the message to the server with username and roomId
+      socket.emit("send_message", {
+        username: username,
+        message: message,
+        roomId: roomId, // Pass the roomId to broadcast to the correct room
+      });
+
+      // Clear the message input
+      setMessage("");
+    } else {
+      console.log("Message is empty, not sending.");
+    }
   };
 
   return (

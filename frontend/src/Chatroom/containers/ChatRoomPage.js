@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import RoomHeader from "../components/RoomHeader";
 import UserList from "../components/UserList";
+import MessageInput from "../components/MessageInput";
+import MessageBox from "../components/MessageBox";
 
 const ChatRoomPage = () => {
   const { roomId } = useParams();
@@ -71,12 +73,10 @@ const ChatRoomPage = () => {
         return;
       }
 
-      console.log("User successfully left the room");
-
       // Remove username from localStorage
       localStorage.removeItem("username");
 
-      // // Call the backend to check if the room is empty 
+      // Call the backend to check if the room is empty 
       // const checkRoomResponse = await fetch(
       //   `http://localhost:5001/rooms/${roomId}/users`
       // );
@@ -120,6 +120,8 @@ const ChatRoomPage = () => {
     <div className="chat-room-page min-h-screen bg-gray-100 flex flex-col">
       <RoomHeader roomName={roomName} onLeaveRoom={handleLeaveRoom} />
       <UserList users={users} />
+      <MessageBox roomId={roomId}/>
+      <MessageInput roomId = {roomId}/>
     </div>
   );
 };
