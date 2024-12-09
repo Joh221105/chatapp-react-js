@@ -2,17 +2,25 @@ import { getDatabase } from "./database.js";
 
 // Create a new room
 export const createRoom = async (req, res) => {
-  const { roomName } = req.body;
+  const { roomName, userId } = req.body;
   const db = await getDatabase();
-  const sql = "INSERT INTO rooms (name) VALUES (?)";
 
   try {
-    const result = await db.run(sql, [roomName]);
-    res
-      .status(201)
-      .json({ roomId: result.lastID, message: "Room created successfully" });
-  } catch (err) {
-    console.error("Error creating room:", err.message);
+    // Insert room
+    const roomResult = await db.run("INSERT INTO rooms (name) VALUES (?)", [
+      roomName,
+    ]);
+    const roomId = roomResult.lastID;
+
+    // adds creator id into room's user list
+    await db.run("INSERT INTO room_users (room_id, user_id) VALUES (?, ?)", [
+      roomId,
+      userId,
+    ]);
+
+    res.status(201).json({ roomId, message: "Room created successfully" });
+  } catch (error) {
+    console.error("Error creating room:", error.message);
     res.status(500).json({ error: "Failed to create room" });
   }
 };
@@ -39,13 +47,18 @@ export const getRoom = async (req, res) => {
 // Get all rooms
 export const getRooms = async (req, res) => {
   const db = await getDatabase();
-  const sql = "SELECT * FROM rooms";
 
   try {
+    const sql = `
+      SELECT rooms.id, rooms.name, COUNT(room_users.user_id) AS user_count
+      FROM rooms
+      LEFT JOIN room_users ON rooms.id = room_users.room_id
+      GROUP BY rooms.id;
+    `;
     const rooms = await db.all(sql);
     res.status(200).json(rooms);
-  } catch (err) {
-    console.error("Error fetching rooms:", err.message);
+  } catch (error) {
+    console.error("Error fetching rooms:", error.message);
     res.status(500).json({ error: "Failed to fetch rooms" });
   }
 };
@@ -54,16 +67,24 @@ export const getRooms = async (req, res) => {
 export const addUserToRoom = async (req, res) => {
   const { roomId, userId } = req.body;
   const db = await getDatabase();
-  const sql = "INSERT INTO room_users (room_id, user_id) VALUES (?, ?)";
 
   try {
-    await db.run(sql, [roomId, userId]);
+    // Check if the user is already in the room
+    const existingUser = await db.get("SELECT * FROM room_users WHERE room_id = ? AND user_id = ?", [roomId, userId]);
+
+    if (existingUser) {
+      return res.status(200).json({ message: "User already in the room" });
+    }
+
+    // Insert user into room_users
+    await db.run("INSERT INTO room_users (room_id, user_id) VALUES (?, ?)", [roomId, userId]);
     res.status(200).json({ message: `User ${userId} added to room ${roomId}` });
-  } catch (err) {
-    console.error("Error adding user to room:", err.message);
+  } catch (error) {
+    console.error("Error adding user to room:", error.message);
     res.status(500).json({ error: "Failed to add user to room" });
   }
 };
+
 
 // Get users in a room
 export const getUsersInRoom = async (req, res) => {
