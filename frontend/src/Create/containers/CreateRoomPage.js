@@ -52,6 +52,10 @@ const CreateRoomPage = () => {
       console.error("Error creating room or adding user:", err.message);
     }
   };
+  
+  const handleBack = () => {
+    navigate('/');
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -77,7 +81,7 @@ const CreateRoomPage = () => {
         >
           Create Room
         </button>
-        <button className="bg-red-500 text-white rounded p-3 hover:bg-red-600 transition duration-200">
+        <button onClick={handleBack} className="bg-red-500 text-white rounded p-3 hover:bg-red-600 transition duration-200">
           Back
         </button>
       </div>
