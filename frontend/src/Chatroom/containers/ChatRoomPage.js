@@ -10,7 +10,7 @@ const ChatRoomPage = () => {
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState("");
   const [users, setUsers] = useState([]);
-  const [messages, setMessages] = useState([]); 
+  const [messages, setMessages] = useState([]);
   const navigate = useNavigate();
 
   const socket = React.useRef(null);
@@ -37,18 +37,21 @@ const ChatRoomPage = () => {
     fetchRoomDetails();
 
     // Emit join_room event to server
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
+    console.log(`User ${userId} is joining room ${roomId}`); // Debug log for username
     if (userId) {
       socket.current.emit("join_room", { roomId, username: userId });
     }
 
     // Listen for real-time updates of the user list
     socket.current.on("update_user_list", (updatedUsers) => {
+      console.log("Updated user list:", updatedUsers); // Debug log for user list
       setUsers(updatedUsers.map((user) => ({ user_id: user.username })));
     });
 
     // Listen for real-time messages
     socket.current.on("receive_message", (messageData) => {
+      console.log("Received message:", messageData); // Debug log for received message
       setMessages((prevMessages) => [...prevMessages, messageData]);
     });
 
@@ -60,7 +63,7 @@ const ChatRoomPage = () => {
   }, [roomId]);
 
   const handleSendMessage = (messageContent) => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
     if (!userId) return;
 
     const messageData = {
@@ -69,7 +72,7 @@ const ChatRoomPage = () => {
       message: messageContent,
     };
 
-    // Emit the message to the server
+    console.log(`Sending message from ${userId}: ${messageContent}`); // Debug log for sent message
     socket.current.emit("send_message", messageData);
 
     setMessages((prevMessages) => [
@@ -79,15 +82,14 @@ const ChatRoomPage = () => {
   };
 
   const handleLeaveRoom = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = sessionStorage.getItem("userId");
 
     if (!userId) {
-      console.error("User ID is not available in localStorage");
+      console.error("User ID is not available in sessionStorage");
       return;
     }
 
     try {
-      // Remove user from the room on the backend
       const response = await fetch("http://localhost:5001/rooms/leave", {
         method: "DELETE",
         headers: {
@@ -101,10 +103,10 @@ const ChatRoomPage = () => {
         return;
       }
 
-      // remove username from localStorage
-      localStorage.removeItem("userId");
+      // Remove username from sessionStorage
+      sessionStorage.removeItem("userId");
 
-      // navigate back to the home page
+      // Navigate back to the home page
       navigate("/");
     } catch (err) {
       console.error("Error leaving room:", err.message);

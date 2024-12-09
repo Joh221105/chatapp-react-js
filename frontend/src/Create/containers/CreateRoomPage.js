@@ -24,8 +24,8 @@ const CreateRoomPage = () => {
         const { roomId } = await createRoomResponse.json();
         console.log("Room created with ID:", roomId);
 
-        // Store the userId (username) in localStorage
-        localStorage.setItem("userId", username);
+        // Store the userId (username) in sessionStorage
+        sessionStorage.setItem("userId", username);
 
         // Add the creator to the room's user list
         const addUserResponse = await fetch(

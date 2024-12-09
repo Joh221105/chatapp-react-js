@@ -33,8 +33,8 @@ const AvailableRooms = () => {
   };
 
   const handleSubmit = async (username) => {
-    // Save the username to localStorage as userId
-    localStorage.setItem("userId", username);
+    // Save the username to sessionStorage as userId
+    sessionStorage.setItem("userId", username);
 
     try {
       const response = await fetch("http://localhost:5001/rooms/addUser", {

@@ -5,7 +5,7 @@ const socket = io("http://localhost:5001");
 
 const MessageInput = ({ roomId }) => {
   const [message, setMessage] = useState("");
-  const username = localStorage.getItem("userId"); // Get username from localStorage
+  const username = sessionStorage.getItem("userId"); // Get username from sessionStorage
 
   const handleSend = () => {
     if (message.trim() !== "") {

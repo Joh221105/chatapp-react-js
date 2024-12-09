@@ -15,8 +15,13 @@ export const setupSocket = (server) => {
 
     // Handle message sending
     socket.on("send_message", (data) => {
-      const formattedMessage = `${data.username}: ${data.message}`;
+      console.log(`Message sent from ${data.username}: ${data.message}`); // Debug log for sent message
 
+      const formattedMessage = {
+        username: data.username, 
+        message: data.message
+      };
+      
       // Broadcast the message to all clients if room id not provided
       if (data.roomId) {
         io.to(data.roomId).emit("receive_message", formattedMessage); // Send to the room
@@ -27,6 +32,7 @@ export const setupSocket = (server) => {
 
     // handle user joining a room
     socket.on("join_room", ({ roomId, username }) => {
+      console.log(`User joined: ${username} in room ${roomId}`); // Debug log for user joining
       socket.join(roomId);
 
       // add user to roomUsers
@@ -53,5 +59,3 @@ export const setupSocket = (server) => {
     });
   });
 };
-
-
