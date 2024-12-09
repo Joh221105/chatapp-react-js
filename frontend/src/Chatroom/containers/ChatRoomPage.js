@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 import RoomHeader from "../components/RoomHeader";
 import UserList from "../components/UserList";
 import MessageInput from "../components/MessageInput";
@@ -9,10 +10,16 @@ const ChatRoomPage = () => {
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState("");
   const [users, setUsers] = useState([]);
+  const [messages, setMessages] = useState([]); 
   const navigate = useNavigate();
 
+  const socket = React.useRef(null);
+
   useEffect(() => {
-    // Fetch room name
+    // Initialize socket connection
+    socket.current = io("http://localhost:5001");
+
+    // Fetch room details on load
     const fetchRoomDetails = async () => {
       try {
         const response = await fetch(`http://localhost:5001/rooms/${roomId}`);
@@ -20,7 +27,6 @@ const ChatRoomPage = () => {
           console.error("Room not found:", response.status);
           return;
         }
-
         const roomData = await response.json();
         setRoomName(roomData.name);
       } catch (err) {
@@ -28,27 +34,49 @@ const ChatRoomPage = () => {
       }
     };
 
-    // Fetch users in the room
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5001/rooms/${roomId}/users`
-        );
-        if (!response.ok) {
-          console.error("Room not found:", response.status);
-          return;
-        }
+    fetchRoomDetails();
 
-        const userList = await response.json();
-        setUsers(Object.values(userList));
-      } catch (err) {
-        console.error("Error fetching users:", err.message);
-      }
+    // Emit join_room event to server
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      socket.current.emit("join_room", { roomId, username: userId });
+    }
+
+    // Listen for real-time updates of the user list
+    socket.current.on("update_user_list", (updatedUsers) => {
+      setUsers(updatedUsers.map((user) => ({ user_id: user.username })));
+    });
+
+    // Listen for real-time messages
+    socket.current.on("receive_message", (messageData) => {
+      setMessages((prevMessages) => [...prevMessages, messageData]);
+    });
+
+    // Cleanup on component 
+    return () => {
+      socket.current.emit("leave_room", roomId); // Notify server about leaving
+      socket.current.disconnect(); // Disconnect the socket
+    };
+  }, [roomId]);
+
+  const handleSendMessage = (messageContent) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    const messageData = {
+      roomId,
+      username: userId,
+      message: messageContent,
     };
 
-    fetchRoomDetails();
-    fetchUsers();
-  }, [roomId]);
+    // Emit the message to the server
+    socket.current.emit("send_message", messageData);
+
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { username: userId, message: messageContent },
+    ]);
+  };
 
   const handleLeaveRoom = async () => {
     const userId = localStorage.getItem("userId");
@@ -59,7 +87,7 @@ const ChatRoomPage = () => {
     }
 
     try {
-      // Remove user from the room
+      // Remove user from the room on the backend
       const response = await fetch("http://localhost:5001/rooms/leave", {
         method: "DELETE",
         headers: {
@@ -73,43 +101,10 @@ const ChatRoomPage = () => {
         return;
       }
 
-      // Remove username from localStorage
-      localStorage.removeItem("username");
+      // remove username from localStorage
+      localStorage.removeItem("userId");
 
-      // Call the backend to check if the room is empty
-      const checkRoomResponse = await fetch(
-        `http://localhost:5001/rooms/${roomId}/users`
-      );
-
-      if (checkRoomResponse.ok) {
-        const usersInRoom = await checkRoomResponse.json();
-
-        // If no users are left in the room, delete the room
-        if (usersInRoom.length === 0) {
-          const deleteRoomResponse = await fetch(
-            `http://localhost:5001/rooms/${roomId}`,
-            {
-              method: "DELETE",
-            }
-          );
-
-          if (deleteRoomResponse.ok) {
-            console.log("Room has been deleted");
-          } else {
-            console.error(
-              "Failed to delete room, status code:",
-              deleteRoomResponse.status
-            );
-          }
-        }
-      } else {
-        console.error(
-          "Failed to fetch users in room, status code:",
-          checkRoomResponse.status
-        );
-      }
-
-      // Navigate to home
+      // navigate back to the home page
       navigate("/");
     } catch (err) {
       console.error("Error leaving room:", err.message);
@@ -121,13 +116,16 @@ const ChatRoomPage = () => {
       <RoomHeader roomName={roomName} onLeaveRoom={handleLeaveRoom} />
 
       <div className="flex-grow flex flex-row">
+        {/* User List Panel */}
         <div className="w-1/4 bg-white border-r border-gray-200 p-4">
           <UserList users={users} />
         </div>
+
+        {/* Chat Messages Panel */}
         <div className="w-3/4 flex flex-col justify-between">
-          <MessageBox roomId={roomId} />
-          <div className=" mb-10 p-10">
-            <MessageInput roomId={roomId} />
+          <MessageBox messages={messages} />
+          <div className="mb-10 p-10">
+            <MessageInput onSendMessage={handleSendMessage} />
           </div>
         </div>
       </div>

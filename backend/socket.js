@@ -3,10 +3,12 @@ import { Server } from "socket.io";
 export const setupSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000", 
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"],
     },
   });
+
+  const roomUsers = {}; // tracks user in each room
 
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
@@ -23,14 +25,33 @@ export const setupSocket = (server) => {
       }
     });
 
-    // Handle user joining a room
-    socket.on("join_room", (roomId) => {
-      socket.join(roomId); // Join the room
+    // handle user joining a room
+    socket.on("join_room", ({ roomId, username }) => {
+      socket.join(roomId);
+
+      // add user to roomUsers
+      if (!roomUsers[roomId]) {
+        roomUsers[roomId] = [];
+      }
+      roomUsers[roomId].push({ socketId: socket.id, username });
+
+      // notify all clients in the room of the updated user list
+      io.to(roomId).emit("update_user_list", roomUsers[roomId]);
     });
 
-    // Handle user disconnecting
+    // handle user leaving or disconnecting
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.id}`);
+      for (const roomId in roomUsers) {
+        roomUsers[roomId] = roomUsers[roomId].filter(
+          (user) => user.socketId !== socket.id
+        );
+
+        // notify the room of the updated user list
+        io.to(roomId).emit("update_user_list", roomUsers[roomId]);
+      }
     });
   });
 };
+
+
