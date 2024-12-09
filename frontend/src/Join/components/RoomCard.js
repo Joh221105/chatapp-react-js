@@ -1,7 +1,7 @@
 import React from "react";
 
 const RoomCard = ({ room, onJoin }) => {
-  const userCount = room.currentUsers ? room.currentUsers.length : 0; // Check if currentUsers exists
+  const userCount = room.user_count || 0; 
 
   return (
     <div className="flex align-center justify-between p-6 border border-gray-300 bg-slate-100 rounded-lg shadow-md mb-4">
